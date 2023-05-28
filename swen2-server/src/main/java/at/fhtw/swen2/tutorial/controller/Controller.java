@@ -59,12 +59,6 @@ public class Controller {
                 e.printStackTrace();
             }
 
-
-
-
-
-
-
             tour = tourService.addNew(tour);
 
 

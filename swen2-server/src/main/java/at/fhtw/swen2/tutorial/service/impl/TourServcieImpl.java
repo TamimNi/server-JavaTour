@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 import java.io.FileOutputStream;
@@ -123,9 +124,15 @@ public class TourServcieImpl implements TourService {
         // Create a Document object
         com.itextpdf.text.Document document = new com.itextpdf.text.Document();
         String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        int min = 100;
+        int max = 999;
+
+        Random random = new Random();
+        int randomNumber = random.nextInt(max - min + 1) + min;
+
         try {
             // Create a PdfWriter object to write the PDF file
-            PdfWriter.getInstance(document, new FileOutputStream("C:/swen2/myfile" + timestamp + ".pdf"));
+            PdfWriter.getInstance(document, new FileOutputStream("C:/swen2/myfile" + timestamp + randomNumber+".pdf"));
 
             // Open the document
             document.open();

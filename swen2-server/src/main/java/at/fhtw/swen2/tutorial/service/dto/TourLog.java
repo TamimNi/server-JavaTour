@@ -12,7 +12,7 @@ import java.util.Date;
 @NoArgsConstructor // Add no-arg constructor
 public class TourLog {
     private Long idLog;
-    private Date dateLog;
+    private String dateLog;
     private String commentLog;
     private String difficultyLog;
     private Long totalTimeLog;

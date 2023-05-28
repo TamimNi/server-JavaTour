@@ -18,7 +18,7 @@ public class TourLogEntity { //TODO link Tour
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tour_seq")
     @SequenceGenerator(name = "tour_seq", sequenceName = "TOUR_SEQUENCE")
     private Long idLog;
-    private Date dateLog;
+    private String dateLog;
     private String commentLog;
     private String difficultyLog;
     private Long totalTimeLog;
