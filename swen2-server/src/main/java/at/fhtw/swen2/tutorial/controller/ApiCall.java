@@ -1,5 +1,7 @@
 package at.fhtw.swen2.tutorial.controller;
 import okhttp3.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
@@ -12,9 +14,11 @@ import java.util.List;
 public class ApiCall {
     private static final String API_URL = "https://www.mapquestapi.com/directions/v2/routematrix?key=%s";
     private static final String apiKey = "ySmPoP4ZPSU290woGOMvF9PQcVCD8NT6";
+
+    private static final Logger logger = LogManager.getLogger(ApiCall.class);
     public static String getRoute(String origin, String destination) throws IOException {
         OkHttpClient client = new OkHttpClient();
-
+        logger.debug("api call to mapquest");
         JSONArray locations = new JSONArray();
         locations.put(origin);
         locations.put(destination);

@@ -5,6 +5,8 @@ import at.fhtw.swen2.tutorial.service.TourService;
 import at.fhtw.swen2.tutorial.service.dto.Tour;
 import at.fhtw.swen2.tutorial.service.dto.TourLog;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,26 +34,23 @@ public class Controller {
     @Autowired
     TourService tourService;
 
+    private static final Logger logger = LogManager.getLogger(Controller.class);
     @PostMapping("/tour")
     public ResponseEntity<Tour> updateData(@RequestBody Tour tour) {
+        logger.debug("/tour post");
         try {
-            System.out.println("_|");
-            System.out.println("Tour" + tour + "<-");
-            System.out.println("-|");
-
+            logger.debug("tour "+tour);
             String origin = tour.getFrom();
             String destination = tour.getTo();
             try {
                 String response = apiCall.getRoute(origin, destination);
-                System.out.println(response);
+                logger.debug("res "+response);
                 JSONObject jsonResponse = new JSONObject(response);
                 JSONArray timeArray = jsonResponse.getJSONArray("time");
                 int timeInSeconds = timeArray.getInt(1);
-                System.out.println("Time in seconds: " + timeInSeconds);
 
                 JSONArray distanceArray = jsonResponse.getJSONArray("distance");
                 double distanceInMiles = distanceArray.getDouble(1);
-                System.out.println("Distance in miles: " + distanceInMiles);
 
                 tour.setEstimatedTime((long) timeInSeconds);
                 tour.setTourDistance((long) distanceInMiles);
@@ -73,6 +72,7 @@ public class Controller {
 
     @GetMapping("/tour")
     public ResponseEntity<List<Tour>> getAllTours() {
+        logger.debug("/tour get");
         try {
             List<Tour> tours = tourService.getList();
 
@@ -87,9 +87,9 @@ public class Controller {
 
     @DeleteMapping("/tour/{tourIdd}")
     public ResponseEntity<Void> deleteTour(@PathVariable String tourIdd) {
+        logger.debug("/tour/{tourIdd} delete");
         try {
             tourService.delOld(Long.valueOf(tourIdd));
-            System.out.println(tourIdd + "<-----------");
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -97,6 +97,7 @@ public class Controller {
     }
     @PutMapping("/tour")
     public ResponseEntity<Tour> updateTour(@RequestBody Tour tour) {
+        logger.debug("/tour put");
         try {
             tour = tourService.updOld(tour);
 
@@ -104,15 +105,13 @@ public class Controller {
             String destination = tour.getTo();
             try {
                 String response = apiCall.getRoute(origin, destination);
-                System.out.println(response);
+                logger.debug("res "+response);
                 JSONObject jsonResponse = new JSONObject(response);
                 JSONArray timeArray = jsonResponse.getJSONArray("time");
                 int timeInSeconds = timeArray.getInt(1);
-                System.out.println("Time in seconds: " + timeInSeconds);
 
                 JSONArray distanceArray = jsonResponse.getJSONArray("distance");
                 double distanceInMiles = distanceArray.getDouble(1);
-                System.out.println("Distance in miles: " + distanceInMiles);
 
                 tour.setEstimatedTime((long) timeInSeconds);
                 tour.setTourDistance((long) distanceInMiles);
@@ -135,10 +134,9 @@ public class Controller {
     TourLogService tourLogService;
     @PostMapping("/tourLog")
     public ResponseEntity<TourLog> updateDataLog(@RequestBody TourLog tourLog) {
+        logger.debug("/tourlog post");
         try {
-            System.out.println("_|");
-            System.out.println("Tour" + tourLog + "<-");
-            System.out.println("-|");
+            logger.debug("/tourlog " + tourLog);
             tourLog = tourLogService.addNew(tourLog);
             return ResponseEntity.ok(tourLog);
         } catch (Exception e) {
@@ -148,8 +146,8 @@ public class Controller {
 
     @GetMapping("/tourLog/{tourId}")
     public ResponseEntity<List<TourLog>> getAllTourLogs(@PathVariable String tourId) {
+        logger.debug("/tourlog/{tourId} get");
         try {
-            System.out.println("HEELllo"+tourId);
             List<TourLog> tourLogs = tourLogService.getList(Long.valueOf(tourId));
             return ResponseEntity.ok(tourLogs);
         } catch (Exception e) {
@@ -159,9 +157,9 @@ public class Controller {
 
     @DeleteMapping("/dellog/{tourId}")
     public ResponseEntity<Void> deleteTourLog(@PathVariable String tourId) {
+        logger.debug("/dellog/{tourId} del");
         try {
             tourLogService.delOldById(Long.valueOf(tourId));
-            System.out.println(tourId + "<-----------");
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -170,8 +168,9 @@ public class Controller {
 
     @PutMapping("/putlog")
     public ResponseEntity<TourLog> updateTour(@RequestBody TourLog tourLog) {
+        logger.debug("/putlog put");
         try {
-            System.out.println(tourLog);
+            logger.debug("tlog "+ tourLog);
             tourLog = tourLogService.updOld(tourLog);
             return ResponseEntity.ok(tourLog);
         } catch (Exception e) {
@@ -185,6 +184,7 @@ public class Controller {
     ////////////////////////////////////////////////////////////////////////////
     @GetMapping("/pdf/single/{tourId}")
     public ResponseEntity<String> getSinglePdf(@PathVariable String tourId) {
+        logger.debug("/pdf/single/{tourId} get");
         try {
             String response = tourService.pdfSingle(Long.valueOf(tourId));
             return ResponseEntity.ok(response);
@@ -194,6 +194,7 @@ public class Controller {
     }
     @GetMapping("/pdf/summary")
     public ResponseEntity<String> getSummaryPdf() {
+        logger.debug("/pdf/summary get");
         try {
 
             String response = tourService.pdfSummary();

@@ -6,6 +6,8 @@ import at.fhtw.swen2.tutorial.service.TourService;
 import at.fhtw.swen2.tutorial.service.dto.Tour;
 import at.fhtw.swen2.tutorial.service.dto.TourLog;
 import at.fhtw.swen2.tutorial.service.mapper.TourMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,9 +38,10 @@ public class TourServcieImpl implements TourService {
     @Autowired
     TourLogServiceImpl tourLogService;
 
+    private static final Logger logger = LogManager.getLogger(TourLogServiceImpl.class);
     @Override
     public List<Tour> getList() {
-        System.out.println("GETING LIST ---------------------------------------------------");
+        logger.debug("getlist");
         List<Tour> tourList = tourMapper.fromEntity(tourRepository.findAll());
         tourList.forEach(tour -> {
 
@@ -77,12 +80,13 @@ public class TourServcieImpl implements TourService {
             updOld(tour);
         });
         tourList = tourMapper.fromEntity(tourRepository.findAll());
-        System.out.println("GETING LIST ---------------------------------------------------");
+
         return tourList;
     }
 
     @Override
     public Tour addNew(Tour tour) {
+        logger.debug("addnew");
         if (tour == null) {
             return null;
         }
@@ -95,6 +99,7 @@ public class TourServcieImpl implements TourService {
 //    private TourLogRepository tourLogRepository;
     @Override
     public void delOld(Long id) {
+        logger.debug("delete");
         if (id == null) {
             return;
         }
@@ -104,6 +109,7 @@ public class TourServcieImpl implements TourService {
 
     @Override
     public Tour updOld(Tour tour) {
+        logger.debug("update");
         if (tour == null || tour.getId() == null) {
             return null;
         }
@@ -114,12 +120,12 @@ public class TourServcieImpl implements TourService {
         TourEntity modifiedEntity = tourMapper.toEntity(tour);
         modifiedEntity.setId(existingEntity.getId()); // set ID to ensure update instead of insert
         modifiedEntity = tourRepository.save(modifiedEntity);
-        System.out.println("THIS IS UPDATE.." + tour.toString() + "..");
         return tourMapper.fromEntity(modifiedEntity);
     }
 
     @Override
     public String pdfSingle(Long id) throws IOException {
+        logger.debug("pdfsingle");
         List<Tour> tourList = getList();
         // Create a Document object
         com.itextpdf.text.Document document = new com.itextpdf.text.Document();
@@ -170,11 +176,11 @@ public class TourServcieImpl implements TourService {
             document.close();
 
             // Generate the URL for the PDF file
-            File file = new File("C:/swen2/myfile" + timestamp + ".pdf");
+            File file = new File("C:/swen2/myfile" + timestamp + randomNumber+ ".pdf");
             String url = "http://localhost:8080/files/" + file.getName();
 
             // Print the URL
-            System.out.println("<a href=\"" + url + "\">" + url + "</a>");
+            logger.info("url "+url);
             return url;
         } catch (Exception e) {
             e.printStackTrace();
@@ -184,13 +190,19 @@ public class TourServcieImpl implements TourService {
 
     @Override
     public String pdfSummary() {//Distance. rating. avg time
+        logger.debug("pdfsummary");
         // Create a Document object
         com.itextpdf.text.Document document = new com.itextpdf.text.Document();
+        int min = 100;
+        int max = 999;
+
+        Random random = new Random();
+        int randomNumber = random.nextInt(max - min + 1) + min;
         try {
 
             String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
             // Create a PdfWriter object to write the PDF file
-            PdfWriter.getInstance(document, new FileOutputStream("C:/swen2/myfile" + timestamp + ".pdf"));
+            PdfWriter.getInstance(document, new FileOutputStream("C:/swen2/myfile" + timestamp + randomNumber + ".pdf"));
             String content = "";
             List<Tour> tourList = getList();
             for (Tour tour : tourList) {
@@ -218,11 +230,11 @@ public class TourServcieImpl implements TourService {
             document.close();
 
             // Generate the URL for the PDF file
-            File file = new File("C:/swen2/myfile" + timestamp + ".pdf");
+            File file = new File("C:/swen2/myfile" + timestamp + randomNumber + ".pdf");
             String url = "http://localhost:8080/files/" + file.getName();
 
             // Print the URL
-            System.out.println("<a href=\"" + url + "\">" + url + "</a>");
+            logger.info("<a href=\"" + url + "\">" + url + "</a>");
             return url;
         } catch (Exception e) {
             e.printStackTrace();
@@ -231,22 +243,3 @@ public class TourServcieImpl implements TourService {
     }
 
 }
-/*
-*
-*         // Choose an appropriate directory to store files
-        File dir = new File("C:/swen2");
-        if (!dir.exists()) {
-            dir.mkdirs();  // create the directory if it doesn't exist
-        }
-        // Generate a timestamp and use it in the filename
-        String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-        File file = new File(dir, "myfile_" + timestamp + ".txt");
-        boolean fileCreated = file.createNewFile();
-        if (!fileCreated) {
-            throw new IOException("Could not create file " + file.getAbsolutePath());
-        }
-        String url = "http://localhost:8080/files/"+file.getName();
-        System.out.println("<a href=\"" + url + "\">" + url + "</a>");
-*
-*
-* */
